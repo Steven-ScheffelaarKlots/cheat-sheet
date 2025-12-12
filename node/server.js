@@ -36,6 +36,14 @@ app.get('/api/lorem', (req, res) => {
   res.json(loremData);
 });
 
+app.get('/api/multiply/:num', (req, res) => {
+  const num = Number(req.params.num);
+  if (!Number.isInteger(num)) {
+    return res.status(400).json({ error: 'Input must be an integer' });
+  }
+  res.json({ input: num, result: num * 50 });
+});
+
 // Endpoint 2: POST request that accepts form data and logs it
 app.post('/api/submit-form', (req, res) => {
   console.log('=== Form Data Received ===');

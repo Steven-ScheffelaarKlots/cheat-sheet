@@ -2,12 +2,16 @@
 
 import React, { useMemo, useState, useEffect, useContext, createContext } from 'react';
 
+import { UseStuffService } from './useStuffService';
+
 // Create a context
 const MyContext = createContext({ value: 0 });
 
 const UseReactFunctions: React.FC = () => {
     // useState to manage local state
     const [count, setCount] = useState(0);
+
+    const [multipliedCount, setMultipliedCount] = useState<number | undefined>(undefined);
 
     // useContext to consume context value
     const contextValue = useContext(MyContext);
@@ -28,12 +32,25 @@ const UseReactFunctions: React.FC = () => {
         };
     }, [count]);
 
+    useEffect(() => {
+    (async () => {
+        try {
+            const result = await UseStuffService.submitNumber(count);
+           console.log(result);
+           setMultipliedCount(result.result)
+        } catch (err) {
+            console.error(err);
+        }
+    })();
+    }, [count]);
+
     
 
     return (
         <div>
             <p>Count: {count}</p>
             <p>Memoized Value: {memoizedValue}</p>
+            <p>Multiplied Value: {multipliedCount}</p>
             <p>Context Value: {contextValue.value}</p>
             <button onClick={() => setCount(count + 1)}>Increment</button>
         </div>
