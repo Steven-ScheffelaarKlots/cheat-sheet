@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface slideShowProps {
   slides: slide[];
@@ -20,9 +20,9 @@ const Slideshow: React.FC<slideShowProps> = (props) => {
     { id: 3, content: 'Slide 3', image: 'image3.jpg' },
   ];
 
-  const nextSlide = () => {
+  const nextSlide = useCallback( () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
-  }
+  }, [slides.length])
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length);
@@ -34,7 +34,7 @@ const Slideshow: React.FC<slideShowProps> = (props) => {
       nextSlide();
     }, 3000);
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [nextSlide]);
 
   return (
     <div>
