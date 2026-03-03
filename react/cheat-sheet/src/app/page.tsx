@@ -7,20 +7,45 @@ async function getRoutes() {
   const appDir = path.join(process.cwd(), 'src/app');
   const entries = fs.readdirSync(appDir, { withFileTypes: true });
   
-  const routes = entries
+  const routes: { path: string; name: string }[] = [];
+  
+  entries
     .filter(entry => entry.isDirectory() && !entry.name.startsWith('_') && entry.name !== 'pages')
-    .filter(entry => {
-      // Check if directory has a page.tsx
-      const pagePath = path.join(appDir, entry.name, 'page.tsx');
-      return fs.existsSync(pagePath);
-    })
-    .map(entry => ({
-      path: `/${entry.name}`,
-      name: entry.name
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-    }));
+    .forEach(entry => {
+      const entryPath = path.join(appDir, entry.name);
+      
+      // Check if directory has a page.tsx (top-level route)
+      const pagePath = path.join(entryPath, 'page.tsx');
+      if (fs.existsSync(pagePath)) {
+        routes.push({
+          path: `/${entry.name}`,
+          name: entry.name
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+        });
+      }
+      
+      // Check for nested routes (one level deeper)
+      const subEntries = fs.readdirSync(entryPath, { withFileTypes: true });
+      subEntries
+        .filter(subEntry => subEntry.isDirectory() && !subEntry.name.startsWith('_'))
+        .forEach(subEntry => {
+          const subPagePath = path.join(entryPath, subEntry.name, 'page.tsx');
+          if (fs.existsSync(subPagePath)) {
+            routes.push({
+              path: `/${entry.name}/${subEntry.name}`,
+              name: `${entry.name
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')} - ${subEntry.name
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}`
+            });
+          }
+        });
+    });
   
   return routes;
 }
