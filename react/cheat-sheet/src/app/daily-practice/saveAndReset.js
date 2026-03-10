@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-require-imports */
 
-import { existsSync, mkdirSync, copyFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+const fs = require('fs');
+const path = require('path');
 
 // Template content for the reset file
 const TEMPLATE_CONTENT = `'use client'
@@ -9,8 +10,10 @@ const TEMPLATE_CONTENT = `'use client'
 import React from 'react';
 
 //Endpoint with post data
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ENDPOINT = "https://jsonplaceholder.typicode.com/posts"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface Post {
     userId: number;
     id: number;
@@ -41,32 +44,32 @@ function getTodaysDate() {
 
 function saveAndReset() {
     const currentDir = __dirname;
-    const reactPracticeFile = join(currentDir, 'reactPractice.tsx');
+    const reactPracticeFile = path.join(currentDir, 'reactPractice.tsx');
     
     // Check if reactPractice.tsx exists
-    if (!existsSync(reactPracticeFile)) {
+    if (!fs.existsSync(reactPracticeFile)) {
         console.error('Error: reactPractice.tsx not found!');
         process.exit(1);
     }
     
     // Create dated directory
     const todaysDate = getTodaysDate();
-    const dateDir = join(currentDir, todaysDate);
+    const dateDir = path.join(currentDir, todaysDate);
     
-    if (!existsSync(dateDir)) {
-        mkdirSync(dateDir, { recursive: true });
+    if (!fs.existsSync(dateDir)) {
+        fs.mkdirSync(dateDir, { recursive: true });
         console.log(`✓ Created directory: ${todaysDate}`);
     } else {
         console.log(`Directory ${todaysDate} already exists`);
     }
     
     // Copy the current reactPractice.tsx to the dated directory
-    const destinationFile = join(dateDir, 'reactPractice.tsx');
-    copyFileSync(reactPracticeFile, destinationFile);
+    const destinationFile = path.join(dateDir, 'reactPractice.tsx');
+    fs.copyFileSync(reactPracticeFile, destinationFile);
     console.log(`✓ Saved current practice to: ${todaysDate}/reactPractice.tsx`);
     
     // Reset reactPractice.tsx to template
-    writeFileSync(reactPracticeFile, TEMPLATE_CONTENT);
+    fs.writeFileSync(reactPracticeFile, TEMPLATE_CONTENT);
     console.log('✓ Reset reactPractice.tsx to original state');
     
     console.log('\n✨ All done! Ready for tomorrow\'s practice.');

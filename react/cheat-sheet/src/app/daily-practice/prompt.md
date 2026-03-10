@@ -2,7 +2,7 @@
 
 
 ### Step 1
-Create a React app that fetches posts from an enpoint and displays it
+Create a React app that fetches posts from an endpoint and displays it
 
 
 ### Step 2
