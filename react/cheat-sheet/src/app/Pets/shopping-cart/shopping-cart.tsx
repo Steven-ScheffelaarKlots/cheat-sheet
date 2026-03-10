@@ -1,5 +1,8 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import "./shopping-cart.css";
+import { totalmem } from "os";
 
 // --- Data provided for the candidate ---
 
@@ -42,6 +45,54 @@ const ShoppingCart: React.FC = () => {
   // TODO: Implement getTotal() — number
   // Sum of price * quantity for all cart items
 
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  const handleAddItem = (product: Product) => {
+    const productIndex = cart.findIndex(
+      (cartitem) => cartitem.product === product,
+    );
+
+    if (productIndex === -1) {
+      setCart([...cart, { product: product, quantity: 1 }]);
+    } else {
+      const tempCart = [...cart];
+      tempCart[productIndex].quantity++;
+      setCart(tempCart);
+    }
+  };
+
+  const handleDecrementItem = (product: Product) => {
+    const productIndex = cart.findIndex(
+      (cartitem) => cartitem.product === product,
+    );
+
+    if (productIndex === -1) {
+      console.error("Item not in cart");
+    } else {
+      if (cart[productIndex].quantity > 1) {
+        const tempCart = [...cart];
+        tempCart[productIndex].quantity--;
+        setCart(tempCart);
+      } else {
+        handleRemoveItem(product)
+      }
+    }
+  };
+
+  const handleRemoveItem = (product: Product) => {
+    const productIndex = cart.findIndex(
+      (cartitem) => cartitem.product === product,
+    );
+    setCart(cart.filter((_, index) => index !== productIndex));
+  };
+
+  const calculateCartTotal = () => {
+    return cart.reduce(
+      (total, cartItem) => total + cartItem.product.price * cartItem.quantity,
+      0,
+    );
+  };
+
   return (
     <div className="shop-layout">
       {/* --- Product List --- */}
@@ -55,7 +106,12 @@ const ShoppingCart: React.FC = () => {
               <span className="product-price">${product.price.toFixed(2)}</span>
             </div>
             {/* TODO: Add "Add to Cart" button that calls addToCart */}
-            <button className="btn btn-add">Add to Cart</button>
+            <button
+              onClick={() => handleAddItem(product)}
+              className="btn btn-add"
+            >
+              Add to Cart
+            </button>
           </div>
         ))}
       </section>
@@ -74,9 +130,30 @@ const ShoppingCart: React.FC = () => {
               - remove button
         */}
 
+        {cart.map((cartItem) => (
+          <div key={cartItem.product.id} className="product-card">
+            <span className="product-emoji">{cartItem.product.emoji}</span>
+            <div className="product-info">
+              <span className="product-name">{cartItem.product.name}</span>
+              <span className="product-price">
+                ${cartItem.product.price.toFixed(2)}
+              </span>
+            </div>
+            {/* TODO: Add "Add to Cart" button that calls addToCart */}
+            <button
+              onClick={() => handleRemoveItem(cartItem.product)}
+              className="btn btn-add"
+            >
+              Remove from Cart
+            </button>
+          </div>
+        ))}
+
         {/* TODO: Show total and a "Checkout" button when cart has items */}
         <div className="cart-footer">
-          <span className="cart-total">Total: $0.00</span>
+          <span className="cart-total">
+            Total: {calculateCartTotal().toFixed(2)}
+          </span>
           <button className="btn btn-checkout">Checkout</button>
         </div>
       </section>

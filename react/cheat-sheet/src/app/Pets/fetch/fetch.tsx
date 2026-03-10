@@ -13,28 +13,33 @@ interface Post {
 }
 
 const FetchComponent: React.FC = () => {
-  const [data, setData] = useState<Post[]>([]);
+
+  const [postData, setPostData] = useState<Post[]>([])
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(ENDPOINT);
-      setData(await response.json());
-    };
-    fetchData();
-  }, []);
+    const fetchPosts  = async () => {
 
-  const removePost = (id: number) => {
-    setData(data.filter((post) => post.id !== id));
-  };
+        const response = await fetch(ENDPOINT)
+        const result = await response.json()
+        setPostData(result)
+
+    }
+
+    fetchPosts()
+
+
+}, [])
+
 
   return (
     <div>
       <div>Fetch Data Component</div>
       <div>
-        {data.map((post) => (
+        {postData.map((post) => (
           <div key={post.id}>
+            <div>{post.userID}</div>
             <div>{post.title}</div>
-            <button onClick={() => removePost(post.id)}>DELETE</button>
+            <div>{post.body}</div>
           </div>
         ))}
       </div>
